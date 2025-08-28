@@ -10,7 +10,9 @@ const {
 
 router.post('/items', createOrUpdateItem);
 router.get('/items', getItems);
-router.get('/item/:id', getItemById);
+
+// put search BEFORE :id so "search" won't be captured as an id
 router.get('/item/search', search);
+router.get('/item/:id', getItemById);
 
 module.exports = router;

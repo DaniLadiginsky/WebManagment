@@ -2,7 +2,7 @@ const { query, withTransaction } = require('./db');
 const volumeModel = require('./volume.model');
 
 /**
- * Upsert item and its volumes (and per-pair prices) inside a transaction.
+ * Upsert item and its volumes inside a transaction.
  * payload: { name, price, categoryId, volumes: [{ value, price }, ...] }
  */
 async function upsertWithVolumes(payload) {
@@ -24,13 +24,13 @@ async function upsertWithVolumes(payload) {
       return { ...item, volumes: [] };
     }
 
-    // 2) Ensure all volumes exist (by value)
+    // 2) Ensure all volumes exist by value (table volumes has only id,value)
     const values = volumes.map(v => v.value);
     const volMap = new Map();
     for (const v of values) {
       const { rows } = await client.query(
-        `INSERT INTO volumes (value, price)
-         VALUES ($1, 0.00)
+        `INSERT INTO volumes (value)
+         VALUES ($1)
          ON CONFLICT (value) DO UPDATE SET value = EXCLUDED.value
          RETURNING id, value;`,
         [v]
